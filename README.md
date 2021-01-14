@@ -49,7 +49,8 @@ The setAttr() method is the universal method to modify the content or value of a
 ### Preparation of your Nextion HMI
 In the Nextion Editor, create a new HMI project, add a font, and place a Number component named n0 on the first (single) page. Compile and and upload the generated tft file to your Nextion HMI
 ### The example sketch
-`#include <NextionX.h> // include the library
+```c++
+#include <NextionX.h> // include the library
 
 initComm(Serial, myNex); // create a NexCom object on the default Serial port (pins 0 and 1 on Arduino)
 
@@ -69,4 +70,5 @@ void loop() {
     counter = 0;  // reset the counter
   }
   delay(100); // wait a little before moving on
-}`
+}
+```
