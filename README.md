@@ -26,7 +26,7 @@ Creates a single Nextion connexion on the selected serial port, named 'tagComm' 
 Initializes the nex_port with nex_baudrate and clears all buffers. If nex_baudrate is omitted, it will default to 9600 baud. Example: `Nex1Comm.begin(115200)` - please make sure that the bauds or baud system variables of the Nextion HMI match this value.
 #### NexCom.cmdWrite(nex_commandString) *method*
 Sends the nex_commandString to the HMI "as is" and adds the 3 byte 0xFF terminator at the end. Example: `Nex1Comm.cmdWrite("sys0=4711")`
-
+****
 Now, if you want the same but with debugging information over a second serial port, you use the following object instead. Because of the additional functionality, it has a slightly bigger memory footprint. This object is primarily intended for developing and testing. Afterwards, it should be replaced by the NexCom object without debugging named with an identical tag. You'll then just need to adapt the parameters in `.begin()` and remove all code calls to `.dbgEnable()`. The derived NexComp objects remain unchanged.
 ### The NexComDbg object
 ... is the direct link between your Arduino code, your Nextion HMI and a serial monitor on a second serial port for debugging. Talking to your Nextion in code means interacting with the NexCom object which is a wrapper for all the communication over the serial port to which your Nextion HMI is hooked up. In parallel, debug info will be sent over the second port. Declaring and instantiating it is somewhat tricky because of the template parameters, that's why there is the following `initCommDbg()` function makro which does all the work for you as follows:
@@ -38,3 +38,35 @@ Initializes the nex_port with nex_baudrate, the debug_port with debug_baudrate, 
 Sends the nex_commandString to the HMI "as is" and adds the 3 byte 0xFF terminator at the end. Example: `Nex1Comm.cmdWrite("sys0=4711")`. In the serial debug monitor, you'll then find a line `Nex1    Cmd sent: sys0=4711`.
 #### NexComDbg.dbgEnable(true/false) *method*
 Debug messages are by default enabled for the NexComDbg object. To disable the debug messages temporarily, use `Nex1Comm.dbgEnable(false)` and to re-enable `Nex1Comm.dbgEnable(true)`
+****
+### The NexComp object
+Creating a NexCom or a NexComDbg object (to taste) includes automatically the definition of the associated NexComp object type which will be named with the same tag. For example, `initComm(Serial, myNex)` creates not only the *myNex*Comm object, but declares also alreay the *myNex*Comp object type, so that GUI components can immediately be instantiated as follows and are automatically bound to to their corresponding *myNex*Comm object. 
+#### NexComp(page_id, obj_id) *constructor*
+Declaring GUI components is as easy as writing `myNexComp myNum(0, 1)` which addresses the component with the id 1 on page 0. Each declared component eats a few bytes of the MCU memory, thus please take care to declare only those components which need to communicate in one or the other way with the MCU.
+#### NexComp.setAttr(attribute, value) *method*
+The setAttr() method is the universal method to modify the content or value of a GUI component's whatever (writable at runtime) attribute. Changing the displayed value of a number field is as easy as `myNum.setAttr("val", 4711)` or, to change the color, `myNum.setAttr("pco", 1024)`. This works not only for numeric values, but also for text: `myTxt.setAttr("txt", "Ready!")` will change the displayed text of a Text component (within the limits of the txt_maxlength attribute). 
+## Example
+### Preparation of your Nextion HMI
+In the Nextion Editor, create a new HMI project, add a font, and place a Number component named n0 on the first (single) page. Compile and and upload the generated tft file to your Nextion HMI
+### The example sketch
+`#include <NextionX.h> // include the library
+
+initComm(Serial, myNex); // create a NexCom object on the default Serial port (pins 0 and 1 on Arduino)
+
+myNexComp myNum(0, 1); // declare the number component with the id 1 on page 0
+
+uint8_t counter = 0; // declare and initialize a counter variable
+
+void setup() {
+  myNexComm.begin(9600); // initialize the communication with the Nextion HMI
+}
+
+void loop() {
+  myNum.setAttr("val", counter); // display the current counter value on the Nextion HMI
+  counter++; // increase the counter by one
+  if(counter > 100) // check if we reached 100
+  {
+    counter = 0;  // reset the counter
+  }
+  delay(100); // wait a little before moving on
+}`
