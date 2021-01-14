@@ -1,0 +1,14 @@
+# Objects (KEYWORD1)
+NexComm	KEYWORD1
+NexComp	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+initComm	KEYWORD2
+initCommDbg	KEYWORD2
+dbgEnable	KEYWORD2
+cmdWrite	KEYWORD2
+setAttr	KEYWORD2
+
+# Structures	(KEYWORD3)
+
+# Constants (LITERAL1)
