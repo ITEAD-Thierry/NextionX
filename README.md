@@ -6,7 +6,7 @@ This library is not in concurrence with the [official Nextion library](https://g
 * [The Sunday Blog: Talking to your Nextion HMI – Part 8: A practical example with the new class](https://nextion.tech/2020/12/21/the-sunday-blog-talking-to-your-nextion-hmi-part-8-a-practical-example-with-the-new-class/)
 * [The Sunday Blog: Talking to your Nextion HMI – Part 9: Let’s create a universal component class](https://nextion.tech/2020/12/28/the-sunday-blog-talking-to-your-nextion-hmi-part-9-lets-create-a-universal-component-class/)
 For new examples using version v0.7.0:
-* [Link to come](#)
+* [The Sunday Blog: The alternative NextionX library does now listen to your Nextion HMI](https://nextion.tech/2021/02/15/the-sunday-blog-the-alternative-nextionx-library-does-now-listen-to-your-nextion-hmi/)
 * more to come...
 ## General information
 To be most universal, this library allows (in opposite to the official library) the use of multiple Nextion HMI displays connected to the same MCU under the condition to have enough hardware or software emulated serial ports (UARTs). 
@@ -47,4 +47,4 @@ Attaches the release_callback_function (has to be declared before in your sketch
 **Note:** During runtime, the `setOnTouch()` and `setOnRelease()` methods might be invoked repeatedly, either to attach a different callback function to a component, or with empty parameter to detach the previous callbck function. 
 
 ## Example(s)
-For example code and the corresponding HMI project, please refer to this blog article: [Link to come](#).
+For example code and the corresponding HMI project, please refer to this blog article: [The Sunday Blog: The alternative NextionX library does now listen to your Nextion HMI](https://nextion.tech/2021/02/15/the-sunday-blog-the-alternative-nextionx-library-does-now-listen-to-your-nextion-hmi/).
