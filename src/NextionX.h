@@ -63,8 +63,12 @@ public:
 	NexComm();
 	template <class nexSerType>
 	void begin(nexSerType &, uint32_t);
+	template <class nexSerType>
+	void begin(nexSerType &);
 	template <class dbgSerType>
 	void addDebug(dbgSerType &, uint32_t);
+	template <class dbgSerType>
+	void addDebug(dbgSerType &);
 	void cmdWrite(String);
 	void loop();
 	void addCmpList(NexComp *);
@@ -93,7 +97,7 @@ private:
  * NexComp Implementation
  */
 template <class NexComm_t>
-NexComp::NexComp(NexComm_t &nexComm, uint8_t pageId, uint8_t objId = 0) : _nexComm(&nexComm)
+NexComp::NexComp(NexComm_t &nexComm, uint8_t pageId, uint8_t objId) : _nexComm(&nexComm)
 {
 	this->_myId.page = pageId;
 	this->_myId.obj = objId;
@@ -144,7 +148,7 @@ void NexComp::callBack(uint8_t evt)
  */
 NexComm::NexComm() {}
 template <class nexSerType>
-void NexComm::begin(nexSerType &nexSer, uint32_t nexBaud = 9600)
+void NexComm::begin(nexSerType &nexSer, uint32_t nexBaud)
 {
 	nexSer.begin(nexBaud);
 	while (!nexSer)
@@ -153,10 +157,29 @@ void NexComm::begin(nexSerType &nexSer, uint32_t nexBaud = 9600)
 	this->cmdWrite("");
 	this->cmdWrite("bkcmd=0");
 }
+template <class nexSerType>
+void NexComm::begin(nexSerType &nexSer)
+{
+	nexSer.begin(9600);
+	while (!nexSer)
+		;
+	this->_nexSer = &nexSer;
+	this->cmdWrite("");
+	this->cmdWrite("bkcmd=0");
+}
 template <class dbgSerType>
-void NexComm::addDebug(dbgSerType &dbgSer, uint32_t dbgBaud = 9600)
+void NexComm::addDebug(dbgSerType &dbgSer, uint32_t dbgBaud)
 {
 	dbgSer.begin(dbgBaud);
+	while (!dbgSer)
+		;
+	this->_dbgSer = &dbgSer;
+	this->cmdWrite("bkcmd=3");
+}
+template <class dbgSerType>
+void NexComm::addDebug(dbgSerType &dbgSer)
+{
+	dbgSer.begin(9600);
 	while (!dbgSer)
 		;
 	this->_dbgSer = &dbgSer;
