@@ -5,6 +5,7 @@ This library is not in concurrence with the [official Nextion library](https://g
 * [The Sunday Blog: Talking to your Nextion HMI – Part 7: Time to wrap things in classes](https://nextion.tech/2020/12/14/the-sunday-blog-talking-to-your-nextion-hmi-part-7-time-to-wrap-things-in-classes/)
 * [The Sunday Blog: Talking to your Nextion HMI – Part 8: A practical example with the new class](https://nextion.tech/2020/12/21/the-sunday-blog-talking-to-your-nextion-hmi-part-8-a-practical-example-with-the-new-class/)
 * [The Sunday Blog: Talking to your Nextion HMI – Part 9: Let’s create a universal component class](https://nextion.tech/2020/12/28/the-sunday-blog-talking-to-your-nextion-hmi-part-9-lets-create-a-universal-component-class/)
+
 For new examples using version v0.7.0:
 * [The Sunday Blog: The alternative NextionX library does now listen to your Nextion HMI](https://nextion.tech/2021/02/15/the-sunday-blog-the-alternative-nextionx-library-does-now-listen-to-your-nextion-hmi/)
 * more to come...
@@ -15,8 +16,12 @@ On an Arduino MEGA, you could for example use the Serial1, Serial2 and Serial3 p
 
 Compared to the published code in the above Blog posts, the usage of the library has again be simplified due to heavy code reworking before publishing it here.
 ## Technical information
-The newest release, v.0.7.0 brings some **elementary API changes** to ease the use. Function macros and separate objects for use with or without debugging as in v0.5.0 are not longer needed! Please refer to the updated reference, below.
+The newest release, v.0.7.1 brings some **elementary API changes** (compared to v0.5.0) to ease the use. Function macros and separate objects for use with or without debugging as in v0.5.0 are not longer needed! Please refer to the updated reference, below.
 ## Versions
+### v.0.7.1
+* This version brings NO API CHANGES!
+* It fixes a few issues like compiler warnings or errors when compiling with other tool chains than the original C++11 based Arduino/AVR toolchain (like, for example, ESP32).
+* Some clean-up in the code allowed to reduce slightly the flash memory usage, especially with debug activated.
 ### v.0.7.0
 * This version does now listen to the return data from the Nextion. This translates in detailed feedback if debugging is enabled and in the new functionality which permits adding onTouch and onRelease callback handlers for individual components.
 * There is no longer a separate object for debugging. The same **NexComm** object can output debug, error and status messages when the `.addDebug()` method is invoked after `.begin()` (see Reference below)
