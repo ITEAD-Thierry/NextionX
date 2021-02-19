@@ -10,6 +10,9 @@
 
 typedef union CompId_t
 {
+	CompId_t(uint8_t page, uint8_t obj) : page(page), obj(obj) {}
+	CompId_t(uint16_t guid) : guid(guid) {}
+	CompId_t(){}
 	uint16_t guid;
 	struct
 	{
@@ -33,7 +36,6 @@ public:
 	NexComp(NexComm_t &, uint8_t, uint8_t);
 	void setAttr(const char *, int32_t);
 	void setAttr(const char *, String);
-	uint16_t getGuid();
 	void setOnTouch(void (*)());
 	void setOnRelease(void (*)());
 	void callBack(uint8_t);
@@ -43,6 +45,8 @@ private:
 	CompId _myId;
 	void (*_onPrs)() = nullptr;
 	void (*_onRel)() = nullptr;
+
+	friend NexComm;
 };
 
 /*
@@ -91,7 +95,7 @@ private:
 	uint8_t _lsPtr = 0;
 	ListEl _lsLst[MAX_LS_LST_LEN];
 
-friend NexComp;
+	friend NexComp;
 };
 
 /*
@@ -109,11 +113,7 @@ void NexComp::setAttr(const char *attr, int32_t num)
 }
 void NexComp::setAttr(const char *attr, String txt)
 {
-	this->_nexComm->cmdWrite((String)"p[" + this->_myId.page + "].b[" + this->_myId.obj + "]." + attr + "=\"" + txt + "\"");
-}
-uint16_t NexComp::getGuid()
-{
-	return this->_myId.guid;
+	this->_nexComm->cmdWrite((String) "p[" + this->_myId.page + "].b[" + this->_myId.obj + "]." + attr + "=\"" + txt + "\"");
 }
 void NexComp::setOnTouch(void (*onPress)() = nullptr)
 {
@@ -189,16 +189,16 @@ void NexComm::addDebug(dbgSerType &dbgSer)
 void NexComm::cmdWrite(String cmd)
 {
 	this->loop(); //handle incoming stuff first
-	this->_nexSer->print(cmd); 
-	this->_nexSer->print("\xFF\xFF\xFF");
+	this->_nexSer->print(cmd);
+	this->_nexSer->write("\xFF\xFF\xFF");
 	if ((this->_dbgSer != nullptr) && (cmd.length() > 0))
 	{
-		this->_dbgSer->println(cmd);
+		this->_dbgSer->print(cmd);
+		this->_dbgSer->write("\r\n");
 	}
 }
 void NexComm::loop()
 {
-	CompId trCmp;
 	this->_rLen = this->_readNextRtn();
 	if ((this->_rLen > 0) && (this->_dbgSer != nullptr))
 	{
@@ -206,8 +206,7 @@ void NexComm::loop()
 	}
 	if ((this->_rLen == 4) && (this->_inStr[0] == 0x65))
 	{
-		trCmp.page = this->_inStr[1];
-		trCmp.obj = this->_inStr[2];
+		CompId trCmp(this->_inStr[1],this->_inStr[2]);
 		uint8_t listpos = this->_fIdxByGuid(trCmp.guid);
 		if (listpos < MAX_LS_LST_LEN)
 		{
@@ -219,7 +218,7 @@ void NexComm::_addCmpList(NexComp *cmp)
 {
 	ListEl mycmp;
 	mycmp.comp = cmp;
-	mycmp.guid = cmp->getGuid();
+	mycmp.guid = cmp->_myId.guid;
 	if (this->_fIdxByGuid(mycmp.guid) == 0xFF)
 	{
 		this->_lsLst[this->_lsPtr++] = mycmp;
@@ -231,26 +230,27 @@ void NexComm::_addCmpList(NexComp *cmp)
 }
 void NexComm::_dbgLoop()
 {
-	String retStr;
 	if ((this->_rLen == 1) && ((this->_inStr[0] < 0x25) || (this->_inStr[0] > 0x85)))
 	{
 		if (this->_inStr[0] == 1)
 		{
-			this->_dbgSer->println("Success");
+			this->_dbgSer->write("Success");
 		}
 		else if (this->_inStr[0] < 0x25)
 		{
-			this->_dbgSer->println("Error " + String(this->_inStr[0], HEX));
+			this->_dbgSer->write("Error ");
+			this->_dbgSer->print(this->_inStr[0], HEX);
 		}
 		else if (this->_inStr[0] > 0x85)
 		{
-			this->_dbgSer->println("Status " + String(this->_inStr[0], HEX));
+			this->_dbgSer->write("Status ");
+			this->_dbgSer->print(this->_inStr[0], HEX);
 		}
+		this->_dbgSer->write("\r\n");
 	}
 	else if ((this->_rLen == 4) && (this->_inStr[0] == 0x65))
 	{
-
-		this->_dbgSer->println((String) (this->_inStr[3] == 1 ? "Press" : "Release") + " page " + this->_inStr[1] + " obj " + this->_inStr[2]);
+		this->_dbgSer->println((String)(this->_inStr[3] == 1 ? "Press" : "Release") + " page " + this->_inStr[1] + " obj " + this->_inStr[2]);
 	}
 }
 uint8_t NexComm::_readNextRtn()
